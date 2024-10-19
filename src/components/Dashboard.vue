@@ -304,6 +304,8 @@ const {
   rnh,
   rnhTax,
   getCurrentTaxRankYear,
+  youthIrs,
+  yearOfYouthIrs,
 } = storeToRefs(useTaxesStore());
 
 const store = useTaxesStore();
@@ -315,6 +317,12 @@ const changeCurrentTaxRankYear = (
   taxRank: (typeof SUPPORTED_TAX_RANK_YEARS)[number],
 ) => {
   store.setCurrentTaxRankYear(taxRank);
+
+  // Check if the youth IRS is available in the new tax rank year
+  const newYouthIrsYears = Object.keys(youthIrs.value[taxRank])[yearOfYouthIrs.value];
+  if (!newYouthIrsYears) {
+    store.setBenefitsOfYouthIrs(false);
+  }
 };
 
 // frequency
@@ -350,11 +358,11 @@ const setSecondYear = (value: boolean) => {
 };
 
 // youth IRS
-const youthIrsYears = [1, 2, 3, 4, 5];
+const youthIrsYears = computed(() => Object.keys(youthIrs.value[getCurrentTaxRankYear.value]));
 const changeYouthIrsYear = (
-  year: 1 | 2 | 3 | 4 | 5,
+  year: string,
 ) => {
-  store.setYearOfYouthIrs(year);
+  store.setYearOfYouthIrs(parseInt(year));
 };
 
 </script>

@@ -12,7 +12,7 @@ import { updateUrlQuery, clearUrlQuery } from "@/router";
 
 export const YEAR_BUSINESS_DAYS = 248;
 export const MONTH_BUSINESS_DAYS = 22;
-export const SUPPORTED_TAX_RANK_YEARS = [2023, 2024];
+export const SUPPORTED_TAX_RANK_YEARS = [2023, 2024, 2025];
 const SIMULATIONS_LOCAL_STORE_KEY = "net_income_simulations";
 
 interface TaxesState {
@@ -94,10 +94,22 @@ const useTaxesStore = defineStore({
         { id: 8, min: 43000, max: 80000, normalTax: 0.45, averageTax: 0.35408 },
         { id: 9, min: 80000, normalTax: 0.48, max: null, averageTax: null },
       ],
+      2025: [
+        { id: 1, min: 0, max: 8059, normalTax: 0.13, averageTax: 0.13 },
+        { id: 2, min: 8059, max: 12160, normalTax: 0.165, averageTax: 0.1418 },
+        { id: 3, min: 12160, max: 17233, normalTax: 0.22, averageTax: 0.16482 },
+        { id: 4, min: 17233, max: 22306, normalTax: 0.25, averageTax: 0.18419 },
+        { id: 5, min: 22306, max: 28400, normalTax: 0.32, averageTax: 0.21334 },
+        { id: 6, min: 28400, max: 41629, normalTax: 0.355, averageTax: 0.25835 },
+        { id: 7, min: 41629, max: 44987, normalTax: 0.435, averageTax: 0.27154 },
+        { id: 8, min: 44987, max: 83696, normalTax: 0.45, averageTax: 0.35408 },
+        { id: 9, min: 83696, normalTax: 0.48, max: null, averageTax: null },
+      ],
     },
     iasPerYear: {
       2023: 480.43,
       2024: 509.26,
+      2025: 509.26,
     },
     rnh: false,
     rnhTax: 0.2,
@@ -123,6 +135,18 @@ const useTaxesStore = defineStore({
         3: { maxDiscountPercentage: 0.5, maxDiscountIasMultiplier: 20 },
         4: { maxDiscountPercentage: 0.5, maxDiscountIasMultiplier: 20 },
         5: { maxDiscountPercentage: 0.25, maxDiscountIasMultiplier: 10 },
+      },
+      2025: {
+        1: { maxDiscountPercentage: 1, maxDiscountIasMultiplier: 55 },
+        2: { maxDiscountPercentage: 0.75, maxDiscountIasMultiplier: 41.25 },
+        3: { maxDiscountPercentage: 0.75, maxDiscountIasMultiplier: 41.25 },
+        4: { maxDiscountPercentage: 0.75, maxDiscountIasMultiplier: 41.25 },
+        5: { maxDiscountPercentage: 0.5, maxDiscountIasMultiplier: 27.5 },
+        6: { maxDiscountPercentage: 0.5, maxDiscountIasMultiplier: 27.5 },
+        7: { maxDiscountPercentage: 0.5, maxDiscountIasMultiplier: 27.5 },
+        8: { maxDiscountPercentage: 0.25, maxDiscountIasMultiplier: 13.75 },
+        9: { maxDiscountPercentage: 0.25, maxDiscountIasMultiplier: 13.75 },
+        10: { maxDiscountPercentage: 0.25, maxDiscountIasMultiplier: 13.75 },
       },
     },
     benefitsOfYouthIrs: false,
@@ -404,11 +428,16 @@ const useTaxesStore = defineStore({
     },
     setBenefitsOfYouthIrs(value: boolean) {
       this.benefitsOfYouthIrs = value;
-      updateUrlQuery({ benefitsOfYouthIrs: this.benefitsOfYouthIrs });
+      if (!value) {
+        this.yearOfYouthIrs = 1;
+      }
+      updateUrlQuery({ benefitsOfYouthIrs: this.benefitsOfYouthIrs, yearOfYouthIrs: this.yearOfYouthIrs });
     },
-    setYearOfYouthIrs(value: 1 | 2 | 3 | 4 | 5) {
-      this.yearOfYouthIrs = value;
-      updateUrlQuery({ yearOfYouthIrs: this.yearOfYouthIrs });
+    setYearOfYouthIrs(value: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10) {
+      if (Object.keys(this.youthIrs[this.currentTaxRankYear]).includes(value.toString())) {
+        this.yearOfYouthIrs = value;
+        updateUrlQuery({ yearOfYouthIrs: this.yearOfYouthIrs });
+      }
     },
     setFirstYear(value: boolean) {
       this.firstYear = value;
